@@ -1,4 +1,4 @@
-# txt_counter：MCP 桌面 Markdown（.md）文件统计器
+# MCP_DEMO： 桌面 Markdown（.md）文件统计、分析器
 
 一个最小可运行的 MCP Demo：
 
