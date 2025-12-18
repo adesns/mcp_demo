@@ -17,7 +17,7 @@ def _setup_logging() -> None:
     """
     日志开关：
     - CLIENT_LOG_LEVEL: DEBUG / INFO / WARNING / ERROR（默认 INFO）
-    - CLIENT_LOG_FILE:  写入日志文件路径（例如：/tmp/client.log 或 ./client.log）
+    - CLIENT_LOG_FILE:  写入日志文件路径（默认 ./client.log；设为空字符串可禁用文件日志）
     - CLIENT_LOG_STDERR: 是否同时输出到终端(stderr)，默认 true（true/false/1/0）
     """
     def _truthy(v: str | None, default: bool = True) -> bool:
@@ -28,6 +28,12 @@ def _setup_logging() -> None:
     level_name = (os.getenv("CLIENT_LOG_LEVEL") or "INFO").upper()
     level = getattr(logging, level_name, logging.INFO)
     log_file = os.getenv("CLIENT_LOG_FILE")
+    # 如果未设置 CLIENT_LOG_FILE，默认使用 ./client.log
+    if log_file is None:
+        log_file = "./client.log"
+    # 如果设置为空字符串，则禁用文件日志
+    elif log_file == "":
+        log_file = None
     to_stderr = _truthy(os.getenv("CLIENT_LOG_STDERR"), default=True)
 
     # 防止重复添加 handlers（多次调用 anyio.run / 交互模式）

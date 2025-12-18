@@ -38,16 +38,14 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2) 直接验证 Server 工具（不走 MCP）
+### 2) 配置：Qwen 环境变量（运行 Client 必配）
+
+`client.py` 当前**只支持**使用 Qwen 来决定“下一步调用哪个 MCP 工具”，因此必须配置：
 
 ```bash
-uv run python -c "from txt_counter import count_desktop_md_files, list_desktop_md_files; print(count_desktop_md_files()); print(list_desktop_md_files())"
-```
-
-读取某个文件（示例：`设计模式.md`）：
-
-```bash
-uv run python -c "from txt_counter import read_desktop_md_file; print(read_desktop_md_file('设计模式.md', max_chars=2000))"
+export QWEN_API_KEY="你的key"
+export QWEN_MODEL="qwen-plus"   # 可选：qwen-turbo / qwen-plus / qwen-max 等
+# export QWEN_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 可选，默认就是这个
 ```
 
 ### 3) 运行 Client（中文提问 + 自动工具调用）
@@ -70,41 +68,24 @@ uv run --with mcp python client.py 我桌面有多少 md 文件
 uv run --with mcp python client.py 给我总结 设计模式.md 中有什么内容
 ```
 
-## 配置：Qwen（必配）
-
-`client.py` 当前**只支持**使用 Qwen 来决定“下一步调用哪个 MCP 工具”，因此必须配置：
+### 4) （可选）直接验证 Server 工具（不走 MCP，不需要 Qwen）
 
 ```bash
-export QWEN_API_KEY="你的key"
-export QWEN_MODEL="qwen-plus"   # 可选：qwen-turbo / qwen-plus / qwen-max 等
-# export QWEN_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 可选，默认就是这个
+uv run python -c "from txt_counter import count_desktop_md_files, list_desktop_md_files; print(count_desktop_md_files()); print(list_desktop_md_files())"
 ```
 
-然后照常运行：
+读取某个文件（示例：`设计模式.md`）：
 
 ```bash
-uv run --with mcp python client.py 我桌面有什么 md 文件
+uv run python -c "from txt_counter import read_desktop_md_file; print(read_desktop_md_file('设计模式.md', max_chars=2000))"
 ```
 
-## 可选：把提问过程日志写入文件
+示例：
 
 ```bash
-export CLIENT_LOG_FILE="./client.log"
-export CLIENT_LOG_LEVEL="INFO"   # 或 DEBUG
+export CLIENT_LOG_LEVEL="DEBUG"
 uv run --with mcp python client.py 给我总结 设计模式.md 中有什么内容
 ```
-
-## 常见问题（FAQ）
-
-### 我看到 Proxy Session Token 的报错，要怎么处理？
-
-如果你用的是 `mcp dev`（Inspector + Proxy），网页/GUI 连接 Proxy 时需要填写 **Session token**。
-
-而本仓库的 `client.py` 是 **STDIO 直连** MCP Server，不需要 token。
-
-### 安全性：会不会读到桌面以外的文件？
-
-不会。`txt_counter.py` 对传入文件名做了路径安全校验，只允许读取桌面目录下的 `.md` 文件，并会拒绝 `../` 等路径穿越。
 
 ## 项目结构
 
